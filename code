@@ -1,0 +1,32 @@
+import concurrent.futures
+import time
+
+# Function to compute the square of a number
+def compute_square(n):
+    time.sleep(1)  # Simulate a time-consuming computation
+    return n * n
+
+def main():
+    numbers = [1, 2, 3, 4, 5]  # Input list of numbers
+    results = []
+
+    # Using ThreadPoolExecutor for parallel execution
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # Map the compute_square function to the numbers list
+        future_to_number = {executor.submit(compute_square, num): num for num in numbers}
+        
+        for future in concurrent.futures.as_completed(future_to_number):
+            number = future_to_number[future]
+            try:
+                result = future.result()
+                results.append(result)
+                print(f'Square of {number} is {result}')
+            except Exception as exc:
+                print(f'{number} generated an exception: {exc}')
+
+    print(f'Final results: {results}')
+
+if __name__ == '__main__':
+    start_time = time.time()
+    main()
+    print(f'Time taken: {time.time() - start_time:.2f} seconds')
